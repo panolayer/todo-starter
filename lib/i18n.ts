@@ -41,6 +41,7 @@ const en = {
   "list.noMatches": "No todos match this view.",
   "list.showMore": "Show more",
   "list.clearCompleted": "Clear completed",
+  "list.completeAll": "Complete all",
 
   "item.edit": "Edit",
   "item.editLabel": "Edit “{title}”",
@@ -94,6 +95,7 @@ const fr: Record<MessageKey, string> = {
   "list.noMatches": "Aucune tâche ne correspond à cette vue.",
   "list.showMore": "Afficher la suite",
   "list.clearCompleted": "Clear completed",
+  "list.completeAll": "Tout terminer",
 
   "item.edit": "Modifier",
   "item.editLabel": "Modifier « {title} »",

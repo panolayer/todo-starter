@@ -82,6 +82,11 @@ export default function HomePage() {
     await refresh();
   }
 
+  async function completeAll() {
+    await fetch("/api/todos/complete", { method: "POST" });
+    await refresh();
+  }
+
   function changeStatus(next: StatusFilter) {
     setStatus(next);
     setLimit(PAGE_SIZE);
@@ -149,11 +154,18 @@ export default function HomePage() {
           {t("list.showMore")}
         </button>
       )}
-      {summary.completed > 0 && (
+      {(summary.active > 0 || summary.completed > 0) && (
         <footer className="list-footer">
-          <button className="text-button" type="button" onClick={clearCompleted}>
-            {t("list.clearCompleted")}
-          </button>
+          {summary.active > 0 && (
+            <button className="text-button" type="button" onClick={completeAll}>
+              {t("list.completeAll")}
+            </button>
+          )}
+          {summary.completed > 0 && (
+            <button className="text-button" type="button" onClick={clearCompleted}>
+              {t("list.clearCompleted")}
+            </button>
+          )}
         </footer>
       )}
     </main>
