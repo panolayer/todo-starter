@@ -3,5 +3,6 @@ node_modules
 .data
 out
 *.log
+*.tsbuildinfo
 .DS_Store
 next-env.d.ts
