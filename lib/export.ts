@@ -2,7 +2,7 @@
 
 import type { Todo } from "./types";
 
-/** The first `limit` todos for the export endpoint's optional `limit` query parameter (all of them when it is absent). */
+/** The todos to export: the first `limit` of them, or every todo when the request has no `limit` query parameter. */
 export function firstTodos(todos: Todo[], params: URLSearchParams): Todo[] {
   const limit = Number(params.get("limit"));
   const shown = todos.slice(0, limit);
