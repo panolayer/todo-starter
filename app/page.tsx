@@ -8,6 +8,8 @@ import { toDateKey } from "@/lib/dates";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 import { Toolbar } from "@/components/Toolbar";
+import { SettingsPanel } from "@/components/SettingsPanel";
+import { useSettings } from "@/components/SettingsProvider";
 
 const PAGE_SIZE = 20;
 const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0, allDone: false };
@@ -16,6 +18,8 @@ const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0, allDone:
 // /api/todos. It never imports the data layer directly — the network boundary
 // keeps the frontend and backend cleanly separated.
 export default function HomePage() {
+  const { settings } = useSettings();
+  const [showSettings, setShowSettings] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [matched, setMatched] = useState(0);
   const [summary, setSummary] = useState<TodoSummary>(EMPTY_SUMMARY);
@@ -91,15 +95,31 @@ export default function HomePage() {
   return (
     <main className="container">
       <header className="header">
-        <h1>Todos</h1>
-        <p className="subtitle">{loading ? "Loading…" : `${summary.active} left to do`}</p>
+        <div>
+          <h1>Todos</h1>
+          <p className="subtitle">{loading ? "Loading…" : `${summary.active} left to do`}</p>
+        </div>
+        <button
+          className="text-button"
+          type="button"
+          aria-expanded={showSettings}
+          onClick={() => setShowSettings(!showSettings)}
+        >
+          Settings
+        </button>
       </header>
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
       {summary.allDone && (
         <p className="all-done" role="status">
           All done — nice work!
         </p>
       )}
-      <AddTodoForm onAdd={addTodo} defaultPriority="medium" />
+      {/* Keyed so the form picks up a new default priority right away. */}
+      <AddTodoForm
+        key={settings.defaultPriority}
+        onAdd={addTodo}
+        defaultPriority={settings.defaultPriority}
+      />
       <Toolbar
         status={status}
         query={query}
