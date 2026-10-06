@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { updateTodo, deleteTodo } from "@/lib/todos";
 import { parseDueDate } from "@/lib/dates";
 import { isPriority, type UpdateTodoInput } from "@/lib/types";
-
-const MAX_TITLE_LENGTH = 200;
+import { MAX_TITLE_LENGTH, parseTitle } from "@/lib/validation";
 
 function badRequest(error: string) {
   return NextResponse.json({ error }, { status: 400 });
@@ -16,10 +15,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const patch: UpdateTodoInput = {};
 
   if (body.title !== undefined) {
-    const title = typeof body.title === "string" ? body.title.trim() : "";
-    if (!title) return badRequest("title must be a non-empty string");
-    if (title.length > MAX_TITLE_LENGTH) {
-      return badRequest(`title must be at most ${MAX_TITLE_LENGTH} characters`);
+    const title = parseTitle(body.title);
+    if (title === null) {
+      return badRequest(`title must be 1 to ${MAX_TITLE_LENGTH} characters of text`);
     }
     patch.title = title;
   }
