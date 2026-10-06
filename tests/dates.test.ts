@@ -78,6 +78,12 @@ describe("parseDueDate", () => {
     expect(parseDueDate("")).toBeNull();
   });
 
+  it("rejects malformed and impossible days", () => {
+    expect(parseDueDate("next week")).toBeUndefined();
+    expect(parseDueDate("2025-3-10")).toBeUndefined();
+    expect(parseDueDate("2025-02-30")).toBeUndefined();
+  });
+
   it("rejects non-string values", () => {
     expect(parseDueDate(20250310)).toBeUndefined();
     expect(parseDueDate({ date: "2025-03-10" })).toBeUndefined();

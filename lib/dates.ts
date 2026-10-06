@@ -63,14 +63,14 @@ export function isDueSoon(todo: { completed: boolean; dueDate: string | null }, 
 }
 
 /**
- * Read a due date from a request body. A YYYY-MM-DD string naming a real
- * calendar day is returned as-is; null or "" clears the due date and returns
- * null. Anything else — a malformed string such as "next week", an impossible
- * day such as "2025-02-30", or a non-string value — returns undefined so the
- * caller can reject the request.
+ * Read a due date from a request body. null or "" clears the due date and
+ * returns null. A string is returned as-is only when isDateKey accepts it (a
+ * YYYY-MM-DD string naming a real calendar day); any other string, such as
+ * "next week" or "2025-02-30", and any non-string value return undefined so
+ * the caller can reject the request.
  */
 export function parseDueDate(value: unknown): string | null | undefined {
   if (value === null || value === "") return null;
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== "string" || !isDateKey(value)) return undefined;
   return value;
 }
