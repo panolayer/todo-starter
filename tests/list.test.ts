@@ -35,6 +35,11 @@ describe("matchesSearch", () => {
     expect(matchesSearch(groceries, "   ")).toBe(true);
   });
 
+  it("ignores case in both the title and the query", () => {
+    expect(matchesSearch(groceries, "GROCERIES")).toBe(true);
+    expect(matchesSearch(todo("Buy Milk"), "milk")).toBe(true);
+  });
+
   it("finds text anywhere in the title", () => {
     expect(matchesSearch(groceries, "groc")).toBe(true);
     expect(matchesSearch(groceries, " groceries ")).toBe(true);

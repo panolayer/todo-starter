@@ -25,13 +25,14 @@ export function matchesStatus(todo: Todo, status: StatusFilter): boolean {
 }
 
 /**
- * True when the todo's title contains the search query. Matching is
- * case-insensitive and ignores spaces around the query, so "milk" finds
- * "Buy Milk". A blank query matches every todo.
+ * True when the todo's title contains the search query, ignoring case: the
+ * query is trimmed, then the title and the query are both lowercased before
+ * comparing, so "milk" and "MILK" both find "Buy Milk". A blank query matches
+ * every todo.
  */
 export function matchesSearch(todo: Todo, query: string): boolean {
-  const q = query.trim();
-  return q === "" || todo.title.includes(q);
+  const q = query.trim().toLowerCase();
+  return q === "" || todo.title.toLowerCase().includes(q);
 }
 
 /** The todos matching both the status tab and the search query, order kept. */
