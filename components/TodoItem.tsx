@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { daysUntil, isDueSoon, isOverdue } from "@/lib/dates";
+import { formatDay, type Locale, type MessageKey } from "@/lib/i18n";
 import type { Todo } from "@/lib/types";
+import { useSettings, useT } from "./SettingsProvider";
 
 interface Props {
   todo: Todo;
@@ -13,16 +15,19 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-function dueLabel(todo: Todo, today: string): string {
-  if (todo.dueDate === null) return "";
-  const days = daysUntil(todo.dueDate, today);
-  if (days === 0) return "Due today";
-  if (days === 1) return "Due tomorrow";
-  if (days < 0) return "Overdue";
-  return `Due ${todo.dueDate}`;
+type Translate = (key: MessageKey, values?: Record<string, string | number>) => string;
+
+function dueLabel(dueDate: string, today: string, locale: Locale, t: Translate): string {
+  const days = daysUntil(dueDate, today);
+  if (days === 0) return t("due.today");
+  if (days === 1) return t("due.tomorrow");
+  if (days < 0) return t("due.overdue");
+  return t("due.on", { date: formatDay(locale, dueDate) });
 }
 
 export function TodoItem({ todo, today, onToggle, onRename, onDelete }: Props) {
+  const { settings } = useSettings();
+  const t = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(todo.title);
 
@@ -49,15 +54,15 @@ export function TodoItem({ todo, today, onToggle, onRename, onDelete }: Props) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Escape" && setEditing(false)}
-            aria-label="Todo title"
+            aria-label={t("item.titleLabel")}
             maxLength={200}
             autoFocus
           />
           <button className="text-button" type="submit">
-            Save
+            {t("item.save")}
           </button>
           <button className="text-button" type="button" onClick={() => setEditing(false)}>
-            Cancel
+            {t("item.cancel")}
           </button>
         </form>
       </li>
@@ -74,15 +79,23 @@ export function TodoItem({ todo, today, onToggle, onRename, onDelete }: Props) {
         />
         <span className="todo-title">{todo.title}</span>
       </label>
-      <span className={`chip priority-${todo.priority}`}>{todo.priority}</span>
-      {todo.dueDate && <span className={`chip due ${dueClass}`}>{dueLabel(todo, today)}</span>}
-      <button className="text-button" onClick={startEditing} aria-label={`Edit "${todo.title}"`}>
-        Edit
+      <span className={`chip priority-${todo.priority}`}>{t(`priority.${todo.priority}`)}</span>
+      {todo.dueDate && (
+        <span className={`chip due ${dueClass}`}>
+          {dueLabel(todo.dueDate, today, settings.language, t)}
+        </span>
+      )}
+      <button
+        className="text-button"
+        onClick={startEditing}
+        aria-label={t("item.editLabel", { title: todo.title })}
+      >
+        {t("item.edit")}
       </button>
       <button
         className="todo-delete"
         onClick={() => onDelete(todo.id)}
-        aria-label={`Delete "${todo.title}"`}
+        aria-label={t("item.deleteLabel", { title: todo.title })}
       >
         ×
       </button>

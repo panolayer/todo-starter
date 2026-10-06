@@ -9,7 +9,7 @@ import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 import { Toolbar } from "@/components/Toolbar";
 import { SettingsPanel } from "@/components/SettingsPanel";
-import { useSettings } from "@/components/SettingsProvider";
+import { useSettings, useT } from "@/components/SettingsProvider";
 
 const PAGE_SIZE = 20;
 const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0, allDone: false };
@@ -19,6 +19,7 @@ const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0, allDone:
 // keeps the frontend and backend cleanly separated.
 export default function HomePage() {
   const { settings } = useSettings();
+  const t = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [matched, setMatched] = useState(0);
@@ -96,8 +97,10 @@ export default function HomePage() {
     <main className="container">
       <header className="header">
         <div>
-          <h1>Todos</h1>
-          <p className="subtitle">{loading ? "Loading…" : `${summary.active} left to do`}</p>
+          <h1>{t("app.title")}</h1>
+          <p className="subtitle">
+            {loading ? t("app.loading") : t("app.leftToDo", { count: summary.active })}
+          </p>
         </div>
         <button
           className="text-button"
@@ -105,13 +108,13 @@ export default function HomePage() {
           aria-expanded={showSettings}
           onClick={() => setShowSettings(!showSettings)}
         >
-          Settings
+          {t("app.settings")}
         </button>
       </header>
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
       {summary.allDone && (
         <p className="all-done" role="status">
-          All done — nice work!
+          {t("app.allDone")}
         </p>
       )}
       {/* Keyed so the form picks up a new default priority right away. */}
@@ -130,22 +133,20 @@ export default function HomePage() {
       <TodoList
         todos={todos}
         today={today}
-        emptyMessage={
-          filtered ? "No todos match this view." : "Nothing here yet — add your first todo above."
-        }
+        emptyMessage={filtered ? t("list.noMatches") : t("list.empty")}
         onToggle={(id, completed) => updateTodo(id, { completed })}
         onRename={(id, title) => updateTodo(id, { title })}
         onDelete={removeTodo}
       />
       {todos.length < matched && (
         <button className="show-more" type="button" onClick={() => setLimit(limit + PAGE_SIZE)}>
-          Show more
+          {t("list.showMore")}
         </button>
       )}
       {summary.completed > 0 && (
         <footer className="list-footer">
           <button className="text-button" type="button" onClick={clearCompleted}>
-            Clear completed
+            {t("list.clearCompleted")}
           </button>
         </footer>
       )}

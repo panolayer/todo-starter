@@ -1,5 +1,6 @@
 import { STATUS_FILTERS, type StatusFilter } from "@/lib/filters";
 import type { TodoSummary } from "@/lib/stats";
+import { useT } from "./SettingsProvider";
 
 interface Props {
   status: StatusFilter;
@@ -9,12 +10,6 @@ interface Props {
   onQueryChange: (query: string) => void;
 }
 
-const STATUS_LABELS: Record<StatusFilter, string> = {
-  all: "All",
-  active: "Active",
-  completed: "Completed",
-};
-
 function countFor(status: StatusFilter, summary: TodoSummary): number {
   if (status === "active") return summary.active;
   if (status === "completed") return summary.completed;
@@ -22,6 +17,7 @@ function countFor(status: StatusFilter, summary: TodoSummary): number {
 }
 
 export function Toolbar({ status, query, summary, onStatusChange, onQueryChange }: Props) {
+  const t = useT();
   return (
     <div className="toolbar">
       <input
@@ -29,10 +25,10 @@ export function Toolbar({ status, query, summary, onStatusChange, onQueryChange 
         type="search"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
-        placeholder="Search todos"
-        aria-label="Search todos"
+        placeholder={t("toolbar.search")}
+        aria-label={t("toolbar.search")}
       />
-      <div className="tabs" role="group" aria-label="Filter by status">
+      <div className="tabs" role="group" aria-label={t("toolbar.filterBy")}>
         {STATUS_FILTERS.map((s) => (
           <button
             key={s}
@@ -41,7 +37,7 @@ export function Toolbar({ status, query, summary, onStatusChange, onQueryChange 
             aria-pressed={s === status}
             onClick={() => onStatusChange(s)}
           >
-            {STATUS_LABELS[s]} <span className="tab-count">{countFor(s, summary)}</span>
+            {t(`status.${s}`)} <span className="tab-count">{countFor(s, summary)}</span>
           </button>
         ))}
       </div>

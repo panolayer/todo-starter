@@ -1,6 +1,7 @@
 // User preferences, saved in this browser's localStorage. Settings never go to
 // the server: they belong to the person at this browser, not to the list.
 
+import { isLocale, type Locale } from "./i18n";
 import { isPriority, type Priority } from "./types";
 
 export type Theme = "system" | "light" | "dark";
@@ -10,6 +11,8 @@ export const THEMES: readonly Theme[] = ["system", "light", "dark"];
 
 export interface Settings {
   theme: Theme;
+  /** Language of the interface. */
+  language: Locale;
   /** Priority preselected on the new-todo form. */
   defaultPriority: Priority;
 }
@@ -19,10 +22,12 @@ export const SETTINGS_STORAGE_KEY = "todo-starter.settings";
 
 /**
  * What everyone starts with before saving anything: follow the system's
- * light/dark theme, and preselect medium priority for new todos.
+ * light/dark theme, show the interface in English, and preselect medium
+ * priority for new todos.
  */
 export const DEFAULT_SETTINGS: Readonly<Settings> = {
   theme: "system",
+  language: "en",
   defaultPriority: "medium",
 };
 
@@ -47,6 +52,7 @@ export function parseSettings(raw: string | null): Settings {
   const fields = saved as Record<string, unknown>;
   return {
     theme: isTheme(fields.theme) ? fields.theme : DEFAULT_SETTINGS.theme,
+    language: isLocale(fields.language) ? fields.language : DEFAULT_SETTINGS.language,
     defaultPriority: isPriority(fields.defaultPriority)
       ? fields.defaultPriority
       : DEFAULT_SETTINGS.defaultPriority,

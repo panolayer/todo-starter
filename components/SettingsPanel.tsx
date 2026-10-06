@@ -1,20 +1,9 @@
 "use client";
 
+import { LOCALES, LOCALE_NAMES, type Locale } from "@/lib/i18n";
 import { THEMES, type Theme } from "@/lib/settings";
 import { PRIORITIES, type Priority } from "@/lib/types";
-import { useSettings } from "./SettingsProvider";
-
-const THEME_LABELS: Record<Theme, string> = {
-  system: "Match system",
-  light: "Light",
-  dark: "Dark",
-};
-
-const PRIORITY_LABELS: Record<Priority, string> = {
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-};
+import { useSettings, useT } from "./SettingsProvider";
 
 interface Props {
   onClose: () => void;
@@ -24,18 +13,19 @@ interface Props {
 // so there is no Save button.
 export function SettingsPanel({ onClose }: Props) {
   const { settings, updateSettings } = useSettings();
+  const t = useT();
 
   return (
     <section className="settings" aria-labelledby="settings-heading">
       <div className="settings-header">
-        <h2 id="settings-heading">Settings</h2>
+        <h2 id="settings-heading">{t("settings.heading")}</h2>
         <button className="text-button" type="button" onClick={onClose}>
-          Done
+          {t("settings.close")}
         </button>
       </div>
       <div className="settings-field">
         <label className="field-label" htmlFor="settings-theme">
-          Theme
+          {t("settings.theme")}
         </label>
         <select
           id="settings-theme"
@@ -45,14 +35,31 @@ export function SettingsPanel({ onClose }: Props) {
         >
           {THEMES.map((theme) => (
             <option key={theme} value={theme}>
-              {THEME_LABELS[theme]}
+              {t(`theme.${theme}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="settings-field">
+        <label className="field-label" htmlFor="settings-language">
+          {t("settings.language")}
+        </label>
+        <select
+          id="settings-language"
+          className="add-select"
+          value={settings.language}
+          onChange={(e) => updateSettings({ language: e.target.value as Locale })}
+        >
+          {LOCALES.map((locale) => (
+            <option key={locale} value={locale} lang={locale}>
+              {LOCALE_NAMES[locale]}
             </option>
           ))}
         </select>
       </div>
       <div className="settings-field">
         <label className="field-label" htmlFor="settings-priority">
-          Default priority for new todos
+          {t("settings.defaultPriority")}
         </label>
         <select
           id="settings-priority"
@@ -62,7 +69,7 @@ export function SettingsPanel({ onClose }: Props) {
         >
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
-              {PRIORITY_LABELS[p]}
+              {t(`priority.${p}`)}
             </option>
           ))}
         </select>

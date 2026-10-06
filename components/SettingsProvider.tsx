@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { translate, type MessageKey } from "@/lib/i18n";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "@/lib/settings";
 
 interface SettingsContextValue {
@@ -27,6 +28,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.theme = settings.theme;
   }, [settings.theme]);
 
+  useEffect(() => {
+    document.documentElement.lang = settings.language;
+  }, [settings.language]);
+
   function updateSettings(patch: Partial<Settings>) {
     const next = { ...settings, ...patch };
     setSettings(next);
@@ -43,4 +48,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 /** The current settings and a function to change them. */
 export function useSettings(): SettingsContextValue {
   return useContext(SettingsContext);
+}
+
+/** A translate function bound to the current language setting. */
+export function useT(): (key: MessageKey, values?: Record<string, string | number>) => string {
+  const { settings } = useSettings();
+  return (key, values) => translate(settings.language, key, values);
 }
