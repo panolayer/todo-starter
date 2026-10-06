@@ -32,6 +32,7 @@ lib/
   query.ts               # parsing for the GET /api/todos query string
   stats.ts               # list summary for the header and tabs
   dates.ts               # calendar-day helpers for due dates
+  validation.ts          # request-body checks shared by the API routes
   settings.ts            # persisted preferences (localStorage)
   i18n.ts                # English and French UI text
 tests/                   # Vitest unit tests for lib/

@@ -53,8 +53,9 @@ export function isOverdue(todo: { completed: boolean; dueDate: string | null }, 
 
 /**
  * True when an open todo is due within the next DUE_SOON_DAYS days, inclusive:
- * anything due from today through DUE_SOON_DAYS days from today is due soon.
- * Completed todos and todos without a due date are never due soon.
+ * anything due from today through DUE_SOON_DAYS days from today is due soon,
+ * so a todo due exactly DUE_SOON_DAYS days from today still counts. Completed
+ * todos and todos without a due date are never due soon.
  */
 export function isDueSoon(todo: { completed: boolean; dueDate: string | null }, today: string): boolean {
   if (todo.completed || todo.dueDate === null) return false;
