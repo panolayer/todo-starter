@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Todo } from "@/lib/types";
+import type { CreateTodoInput, Todo } from "@/lib/types";
+import { toDateKey } from "@/lib/dates";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 
@@ -11,6 +12,7 @@ import { TodoList } from "@/components/TodoList";
 export default function HomePage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
+  const today = toDateKey(new Date());
 
   async function refresh() {
     const res = await fetch("/api/todos");
@@ -23,20 +25,20 @@ export default function HomePage() {
     refresh();
   }, []);
 
-  async function addTodo(title: string) {
+  async function addTodo(input: CreateTodoInput) {
     await fetch("/api/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify(input),
     });
     await refresh();
   }
 
-  async function toggleTodo(id: string, completed: boolean) {
+  async function updateTodo(id: string, patch: Partial<Todo>) {
     await fetch(`/api/todos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed }),
+      body: JSON.stringify(patch),
     });
     await refresh();
   }
@@ -54,8 +56,14 @@ export default function HomePage() {
         <h1>Todos</h1>
         <p className="subtitle">{loading ? "Loading…" : `${remaining} remaining`}</p>
       </header>
-      <AddTodoForm onAdd={addTodo} />
-      <TodoList todos={todos} onToggle={toggleTodo} onDelete={removeTodo} />
+      <AddTodoForm onAdd={addTodo} defaultPriority="medium" />
+      <TodoList
+        todos={todos}
+        today={today}
+        onToggle={(id, completed) => updateTodo(id, { completed })}
+        onRename={(id, title) => updateTodo(id, { title })}
+        onDelete={removeTodo}
+      />
     </main>
   );
 }

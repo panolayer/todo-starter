@@ -14,6 +14,10 @@ export async function GET() {
 // so an empty title, a missing field, or a huge blob all get written verbatim.
 export async function POST(req: Request) {
   const body = await req.json();
-  const todo = await createTodo(body.title);
+  const todo = await createTodo({
+    title: body.title,
+    priority: body.priority,
+    dueDate: body.dueDate,
+  });
   return NextResponse.json({ todo }, { status: 201 });
 }

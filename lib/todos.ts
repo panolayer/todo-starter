@@ -4,7 +4,7 @@
 
 import { randomUUID } from "crypto";
 import { readAll, writeAll } from "./db";
-import type { Todo, UpdateTodoInput } from "./types";
+import { isPriority, type CreateTodoInput, type Todo, type UpdateTodoInput } from "./types";
 
 /** List todos, newest first. */
 export async function listTodos(): Promise<Todo[]> {
@@ -12,13 +12,18 @@ export async function listTodos(): Promise<Todo[]> {
   return [...todos].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-/** Create a todo with the given title. */
-export async function createTodo(title: string): Promise<Todo> {
+/**
+ * Create an open todo. Priority defaults to medium when it is missing or not a
+ * known priority, and the due date defaults to none.
+ */
+export async function createTodo(input: CreateTodoInput): Promise<Todo> {
   const todos = await readAll();
   const todo: Todo = {
     id: randomUUID(),
-    title,
+    title: input.title,
     completed: false,
+    priority: isPriority(input.priority) ? input.priority : "medium",
+    dueDate: input.dueDate ?? null,
     createdAt: new Date().toISOString(),
   };
   todos.push(todo);

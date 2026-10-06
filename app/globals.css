@@ -7,6 +7,7 @@
   --muted: #9aa0ac;
   --accent: #6d8bff;
   --danger: #ff6b6b;
+  --warning: #f5b84b;
 }
 
 * {
@@ -49,11 +50,43 @@ body {
 
 .add-form {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
-.add-input {
+.add-row {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.add-select {
+  padding: 11px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  color-scheme: dark;
+}
+
+.add-input,
+.edit-input {
   flex: 1;
   padding: 12px 14px;
   background: var(--panel);
@@ -64,11 +97,14 @@ body {
   outline: none;
 }
 
-.add-input:focus {
+.add-input:focus,
+.edit-input:focus,
+.add-select:focus {
   border-color: var(--accent);
 }
 
 .add-button {
+  margin-left: auto;
   padding: 12px 20px;
   background: var(--accent);
   border: none;
@@ -146,4 +182,69 @@ body {
   font-size: 14px;
   text-align: center;
   padding: 32px 0;
+}
+
+.todo-item.editing {
+  padding: 8px;
+}
+
+.edit-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.edit-input {
+  padding: 8px 10px;
+  font-size: 15px;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.chip.priority-high {
+  border-color: rgba(255, 107, 107, 0.4);
+  color: var(--danger);
+}
+
+.chip.priority-low {
+  opacity: 0.75;
+}
+
+.chip.due {
+  text-transform: none;
+}
+
+.chip.due.soon {
+  border-color: rgba(245, 184, 75, 0.45);
+  color: var(--warning);
+}
+
+.chip.due.overdue {
+  background: rgba(255, 107, 107, 0.12);
+  border-color: transparent;
+  color: var(--danger);
+}
+
+.text-button {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.text-button:hover {
+  color: var(--text);
+  background: var(--panel-2);
 }
