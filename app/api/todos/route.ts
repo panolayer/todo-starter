@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listTodos, createTodo, clearCompleted } from "@/lib/todos";
+import { listTodos, createTodo, clearCompleted, backupTodos } from "@/lib/todos";
 import { filterTodos } from "@/lib/filters";
 import { parseListQuery } from "@/lib/query";
 import { summarize } from "@/lib/stats";
@@ -39,7 +39,9 @@ export async function POST(req: Request) {
 }
 
 // DELETE /api/todos — remove every completed todo and report how many went.
+// The list is backed up first, so cleared todos can still be recovered.
 export async function DELETE() {
+  await backupTodos();
   const removed = await clearCompleted();
   return NextResponse.json({ removed });
 }
