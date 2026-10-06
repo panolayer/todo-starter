@@ -49,3 +49,11 @@ export async function deleteTodo(id: string): Promise<boolean> {
   await writeAll(next);
   return true;
 }
+
+/** Delete every completed todo. Returns how many were removed. */
+export async function clearCompleted(): Promise<number> {
+  const todos = await readAll();
+  const open = todos.filter((t) => !t.completed);
+  if (open.length !== todos.length) await writeAll(open);
+  return todos.length - open.length;
+}

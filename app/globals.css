@@ -318,3 +318,19 @@ body {
   color: var(--text);
   border-color: var(--accent);
 }
+
+.all-done {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  background: rgba(109, 139, 255, 0.1);
+  border-radius: 10px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.list-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}

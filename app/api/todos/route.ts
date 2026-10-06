@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listTodos, createTodo } from "@/lib/todos";
+import { listTodos, createTodo, clearCompleted } from "@/lib/todos";
 import { filterTodos } from "@/lib/filters";
 import { parseListQuery } from "@/lib/query";
 import { summarize } from "@/lib/stats";
@@ -33,4 +33,10 @@ export async function POST(req: Request) {
     dueDate: body.dueDate,
   });
   return NextResponse.json({ todo }, { status: 201 });
+}
+
+// DELETE /api/todos — remove every completed todo and report how many went.
+export async function DELETE() {
+  const removed = await clearCompleted();
+  return NextResponse.json({ removed });
 }

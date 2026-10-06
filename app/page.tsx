@@ -10,7 +10,7 @@ import { TodoList } from "@/components/TodoList";
 import { Toolbar } from "@/components/Toolbar";
 
 const PAGE_SIZE = 20;
-const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0 };
+const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0, allDone: false };
 
 // The home page is a thin client that talks to the API routes under
 // /api/todos. It never imports the data layer directly — the network boundary
@@ -71,6 +71,11 @@ export default function HomePage() {
     await refresh();
   }
 
+  async function clearCompleted() {
+    await fetch("/api/todos", { method: "DELETE" });
+    await refresh();
+  }
+
   function changeStatus(next: StatusFilter) {
     setStatus(next);
     setLimit(PAGE_SIZE);
@@ -89,6 +94,11 @@ export default function HomePage() {
         <h1>Todos</h1>
         <p className="subtitle">{loading ? "Loading…" : `${summary.active} left to do`}</p>
       </header>
+      {summary.allDone && (
+        <p className="all-done" role="status">
+          All done — nice work!
+        </p>
+      )}
       <AddTodoForm onAdd={addTodo} defaultPriority="medium" />
       <Toolbar
         status={status}
@@ -111,6 +121,13 @@ export default function HomePage() {
         <button className="show-more" type="button" onClick={() => setLimit(limit + PAGE_SIZE)}>
           Show more
         </button>
+      )}
+      {summary.completed > 0 && (
+        <footer className="list-footer">
+          <button className="text-button" type="button" onClick={clearCompleted}>
+            Clear completed
+          </button>
+        </footer>
       )}
     </main>
   );
