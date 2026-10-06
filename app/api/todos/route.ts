@@ -3,12 +3,14 @@ import { listTodos, createTodo, clearCompleted } from "@/lib/todos";
 import { filterTodos } from "@/lib/filters";
 import { parseListQuery } from "@/lib/query";
 import { summarize } from "@/lib/stats";
+import { duplicateTitles } from "@/lib/duplicates";
 
 // GET /api/todos — list todos, newest first.
 //
 // Optional query parameters: `status` (all | active | completed), `q` (search
 // text) and `limit` (how many to return). The response carries the page of
-// todos, how many todos matched in total, and a summary of the whole list.
+// todos, how many todos matched in total, a summary of the whole list, and the
+// titles that appear on more than one todo.
 export async function GET(req: Request) {
   const { status, q, limit } = parseListQuery(new URL(req.url).searchParams);
   const all = await listTodos();
@@ -17,6 +19,7 @@ export async function GET(req: Request) {
     todos: matching.slice(0, limit),
     matched: matching.length,
     summary: summarize(all),
+    duplicates: duplicateTitles(all),
   });
 }
 
