@@ -3,8 +3,10 @@
 A small, clean **Next.js (App Router) todolist with an API backend** — used as a
 starter/tutorial project for [Panolayer](https://panolayer.com).
 
-It is deliberately simple but properly layered, so it reads clearly in
-Panolayer's **Architecture** view:
+Todos have a priority and an optional due date, the list can be searched and
+filtered by status, and the interface is available in English and French with
+light and dark themes. It is deliberately small but properly layered, so it
+reads clearly in Panolayer's **Architecture** view:
 
 ```
 app/
@@ -13,37 +15,71 @@ app/
   globals.css
   api/
     todos/
-      route.ts          # GET (list) + POST (create)
-      [id]/route.ts     # PATCH (toggle/rename) + DELETE
+      route.ts          # GET (list, filter, search) + POST (create) + DELETE (clear completed)
+      [id]/route.ts     # PATCH (toggle/rename/reprioritize/reschedule) + DELETE
 components/
-  AddTodoForm.tsx        # new-todo form
+  AddTodoForm.tsx        # new-todo form (title, priority, due date)
+  Toolbar.tsx            # search box + status tabs
   TodoList.tsx           # renders the list
-  TodoItem.tsx           # one row
+  TodoItem.tsx           # one row, with inline renaming
+  SettingsPanel.tsx      # theme, language, default priority
+  SettingsProvider.tsx   # settings + translation context for the page
 lib/
   types.ts               # shared domain types
   db.ts                  # JSON-file-backed store (a stand-in for a database)
   todos.ts               # data-access layer (the API's only door to storage)
+  filters.ts             # status tabs and search matching
+  query.ts               # parsing for the GET /api/todos query string
+  stats.ts               # list summary for the header and tabs
+  dates.ts               # calendar-day helpers for due dates
+  settings.ts            # persisted preferences (localStorage)
+  i18n.ts                # English and French UI text
+tests/                   # Vitest unit tests for lib/
 ```
 
 The layers are strict: the **UI** talks only to the **API routes**, and the API
 routes talk only to the **data-access layer** (`lib/todos`), which is the only
-code that touches the **store** (`lib/db`).
+code that touches the **store** (`lib/db`). The other `lib/` modules are pure
+helpers shared by both sides.
 
 ## Run it
 
+Use **pnpm 10.4.1** (pinned by `packageManager` in `package.json`; `corepack pnpm`
+selects it if your global pnpm differs) and Node.js 20 or newer.
+
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev
 # open http://localhost:3000
 ```
 
 Data is persisted to `.data/todos.json` (gitignored); it is seeded on first run.
+Settings are saved per browser in `localStorage`.
 
-## A note for the tutorial
+## Checks
 
-This starter ships with one small, intentional weakness: the **create-todo API
-(`POST /api/todos`) does not validate its input**. It trusts `body.title` and
-writes whatever it is given — including an empty string, a missing field, or a
-huge blob. Panolayer's guided tutorial uses this as the "author a rule, watch it
-fail, then fix it" exercise. Everything else is meant to be a clean example of a
-well-structured little app.
+```bash
+pnpm typecheck   # tsc --noEmit
+pnpm test        # Vitest unit tests
+pnpm build       # production build
+pnpm check       # all three, in that order
+```
+
+## API
+
+| Method & path            | Does                                                                 |
+| ------------------------ | -------------------------------------------------------------------- |
+| `GET /api/todos`         | List todos, newest first. Optional `status`, `q` and `limit` params. |
+| `POST /api/todos`        | Create a todo from `{ title, priority?, dueDate? }`.                 |
+| `DELETE /api/todos`      | Remove every completed todo; returns `{ removed }`.                  |
+| `PATCH /api/todos/:id`   | Change any of `title`, `completed`, `priority`, `dueDate`.           |
+| `DELETE /api/todos/:id`  | Remove one todo.                                                     |
+
+`priority` is `low`, `medium` or `high`; `dueDate` is a `YYYY-MM-DD` day or `null`.
+
+## The guided tutorial
+
+The create-todo endpoint (`POST /api/todos`) does not validate its body yet: it
+trusts `body.title` and writes whatever it is given — including an empty
+string, a missing field, or a huge blob. Panolayer's guided tutorial uses it for
+its "author a rule, watch it fail, then fix it" exercise.
