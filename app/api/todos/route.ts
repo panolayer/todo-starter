@@ -9,8 +9,7 @@ import { duplicateTitles } from "@/lib/duplicates";
 //
 // Optional query parameters: `status` (all | active | completed), `q` (search
 // text) and `limit` (how many to return). The response carries the page of
-// todos, how many todos matched in total, a summary of the whole list, and the
-// titles that appear on more than one todo.
+// todos, how many todos matched in total, and a summary of the whole list.
 export async function GET(req: Request) {
   const { status, q, limit } = parseListQuery(new URL(req.url).searchParams);
   const all = await listTodos();
