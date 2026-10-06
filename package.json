@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "A small Next.js todolist with an API backend — a Panolayer starter/tutorial project.",
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@12.9.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -26,11 +26,6 @@
     "vitest": "3.2.4"
   },
   "engines": {
-    "node": ">=20"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+    "node": ">=24"
   }
 }

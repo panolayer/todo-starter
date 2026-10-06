@@ -51,8 +51,8 @@ helpers shared by both sides.
 
 ## Run it
 
-Use **pnpm 10.4.1** (pinned by `packageManager` in `package.json`; `corepack pnpm`
-selects it if your global pnpm differs) and Node.js 20 or newer.
+Use **pnpm 12.9.1** (pinned by `packageManager` in `package.json`; `corepack pnpm`
+selects it if your global pnpm differs) and Node.js 24 or newer.
 
 ```bash
 pnpm install --frozen-lockfile

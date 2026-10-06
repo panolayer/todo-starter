@@ -6,9 +6,9 @@ codebase.
 
 ## Tooling
 
-Use **pnpm 10.4.1** (pinned by `packageManager`); do not add npm or Yarn
-lockfiles. If the global pnpm is a different version, prefix commands with
-`corepack pnpm`.
+Use **pnpm 12.9.1** (pinned by `packageManager`) on Node.js 24; do not add npm
+or Yarn lockfiles. If the global pnpm is a different version, prefix commands
+with `corepack pnpm`.
 
 | Task                 | Command                          |
 | -------------------- | -------------------------------- |
