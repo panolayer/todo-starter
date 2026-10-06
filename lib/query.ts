@@ -23,14 +23,15 @@ export function parseStatus(raw: string | null): StatusFilter {
 
 /**
  * Read the `limit` parameter: how many todos to return. A missing or
- * non-numeric value falls back to DEFAULT_LIMIT; any other value is rounded
- * down and clamped to the range 1 to MAX_LIMIT.
+ * non-numeric value falls back to DEFAULT_LIMIT. Any other value is rounded
+ * down and clamped to the range 1 to MAX_LIMIT: zero or a negative number
+ * becomes 1, and anything above MAX_LIMIT becomes MAX_LIMIT.
  */
 export function parseLimit(raw: string | null): number {
   if (raw === null || raw.trim() === "") return DEFAULT_LIMIT;
   const n = Number(raw);
   if (!Number.isFinite(n)) return DEFAULT_LIMIT;
-  return Math.min(Math.floor(n), MAX_LIMIT);
+  return Math.min(Math.max(Math.floor(n), 0), MAX_LIMIT);
 }
 
 /** Parse the list query string. The search text is trimmed and length-capped. */
