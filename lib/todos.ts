@@ -3,6 +3,8 @@
 // requests come in" (app/api) and "how data is stored" (lib/db).
 
 import { randomUUID } from "crypto";
+import { mkdir } from "fs/promises";
+import { BACKUP_DIR, writeBackup } from "./backup";
 import { readAll, writeAll } from "./db";
 import { isPriority, type CreateTodoInput, type Todo, type UpdateTodoInput } from "./types";
 
@@ -56,4 +58,11 @@ export async function clearCompleted(): Promise<number> {
   const open = todos.filter((t) => !t.completed);
   if (open.length !== todos.length) await writeAll(open);
   return todos.length - open.length;
+}
+
+/** Save a snapshot of every todo under .data/backups and return the file's path. */
+export async function backupTodos(): Promise<string> {
+  const todos = await readAll();
+  await mkdir(BACKUP_DIR, { recursive: true });
+  return writeBackup(todos, BACKUP_DIR);
 }
