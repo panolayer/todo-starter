@@ -17,6 +17,8 @@ app/
     todos/
       route.ts          # GET (list, filter, search) + POST (create) + DELETE (clear completed)
       [id]/route.ts     # PATCH (toggle/rename/reprioritize/reschedule) + DELETE
+      complete/route.ts # POST (complete every open todo)
+      export/route.ts   # GET (download the list as JSON)
 components/
   AddTodoForm.tsx        # new-todo form (title, priority, due date)
   Toolbar.tsx            # search box + status tabs
@@ -33,6 +35,10 @@ lib/
   stats.ts               # list summary for the header and tabs
   dates.ts               # calendar-day helpers for due dates
   validation.ts          # request-body checks shared by the API routes
+  titles.ts              # looking todos up by title
+  duplicates.ts          # titles that appear on more than one todo
+  export.ts              # the JSON download behind the Export link
+  backup.ts              # snapshots written before clearing completed todos
   settings.ts            # persisted preferences (localStorage)
   i18n.ts                # English and French UI text
 tests/                   # Vitest unit tests for lib/
@@ -68,13 +74,15 @@ pnpm check       # all three, in that order
 
 ## API
 
-| Method & path            | Does                                                                 |
-| ------------------------ | -------------------------------------------------------------------- |
-| `GET /api/todos`         | List todos, newest first. Optional `status`, `q` and `limit` params. |
-| `POST /api/todos`        | Create a todo from `{ title, priority?, dueDate? }`.                 |
-| `DELETE /api/todos`      | Remove every completed todo; returns `{ removed }`.                  |
-| `PATCH /api/todos/:id`   | Change any of `title`, `completed`, `priority`, `dueDate`.           |
-| `DELETE /api/todos/:id`  | Remove one todo.                                                     |
+| Method & path              | Does                                                                 |
+| -------------------------- | -------------------------------------------------------------------- |
+| `GET /api/todos`           | List todos, newest first. Optional `status`, `q` and `limit` params; also returns `duplicates`. |
+| `POST /api/todos`          | Create a todo from `{ title, priority?, dueDate? }`.                 |
+| `DELETE /api/todos`        | Back up the list to `.data/backups`, then remove every completed todo; returns `{ removed }`. |
+| `POST /api/todos/complete` | Mark every open todo as completed; returns `{ completed }`.          |
+| `GET /api/todos/export`    | Download the todos as `todos.json`. Optional `limit` param.          |
+| `PATCH /api/todos/:id`     | Change any of `title`, `completed`, `priority`, `dueDate`; `409` if the new title is taken. |
+| `DELETE /api/todos/:id`    | Remove one todo.                                                     |
 
 `priority` is `low`, `medium` or `high`; `dueDate` is a `YYYY-MM-DD` day or `null`.
 
