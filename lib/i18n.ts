@@ -19,6 +19,7 @@ const en = {
   "app.leftToDo": "{count} left to do",
   "app.allDone": "All done — nice work!",
   "app.settings": "Settings",
+  "app.export": "Export",
 
   "form.title": "Title",
   "form.titlePlaceholder": "What needs to be done?",
@@ -71,6 +72,7 @@ const fr: Record<MessageKey, string> = {
   "app.leftToDo": "À faire : {count}",
   "app.allDone": "Tout est fait — bravo !",
   "app.settings": "Réglages",
+  "app.export": "Exporter",
 
   "form.title": "Intitulé",
   "form.titlePlaceholder": "Que faut-il faire ?",

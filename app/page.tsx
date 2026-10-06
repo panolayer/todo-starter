@@ -103,14 +103,19 @@ export default function HomePage() {
             {loading ? t("app.loading") : t("app.leftToDo", { count: summary.active })}
           </p>
         </div>
-        <button
-          className="text-button"
-          type="button"
-          aria-expanded={showSettings}
-          onClick={() => setShowSettings(!showSettings)}
-        >
-          {t("app.settings")}
-        </button>
+        <div className="header-actions">
+          <a className="text-button" href="/api/todos/export" download="todos.json">
+            {t("app.export")}
+          </a>
+          <button
+            className="text-button"
+            type="button"
+            aria-expanded={showSettings}
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            {t("app.settings")}
+          </button>
+        </div>
       </header>
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
       {summary.allDone && (
