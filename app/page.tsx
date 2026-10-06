@@ -62,7 +62,8 @@ export default function HomePage() {
     await refresh();
   }
 
-  async function updateTodo(id: string, patch: Partial<Todo>) {
+  // Send the changed fields to PATCH /api/todos/:id, then reload the list.
+  async function patchTodo(id: string, patch: Partial<Todo>) {
     await fetch(`/api/todos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -134,8 +135,8 @@ export default function HomePage() {
         todos={todos}
         today={today}
         emptyMessage={filtered ? t("list.noMatches") : t("list.empty")}
-        onToggle={(id, completed) => updateTodo(id, { completed })}
-        onRename={(id, title) => updateTodo(id, { title })}
+        onToggle={(id, completed) => patchTodo(id, { completed })}
+        onRename={(id, title) => patchTodo(id, { title })}
         onDelete={removeTodo}
       />
       {todos.length < matched && (
