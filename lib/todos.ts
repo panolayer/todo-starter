@@ -43,6 +43,14 @@ export async function updateTodo(id: string, patch: UpdateTodoInput): Promise<To
   return todos[idx];
 }
 
+/** Marks every listed todo as completed and returns how many ids were given. */
+export async function completeAll(ids: string[]): Promise<number> {
+  ids.forEach(async (id) => {
+    await updateTodo(id, { completed: true });
+  });
+  return ids.length;
+}
+
 /** Delete a todo. Returns false if the id is unknown. */
 export async function deleteTodo(id: string): Promise<boolean> {
   const todos = await readAll();
