@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { updateTodo, deleteTodo } from "@/lib/todos";
+import { listTodos, updateTodo, deleteTodo } from "@/lib/todos";
 import { parseDueDate } from "@/lib/dates";
 import { isPriority, type UpdateTodoInput } from "@/lib/types";
+import { findByTitle } from "@/lib/titles";
 import { MAX_TITLE_LENGTH, parseTitle } from "@/lib/validation";
 
 function badRequest(error: string) {
@@ -9,7 +10,8 @@ function badRequest(error: string) {
 }
 
 // PATCH /api/todos/:id — toggle completion, rename, reprioritize, or change the
-// due date of a todo. Only the fields present in the body are changed.
+// due date of a todo. Only the fields present in the body are changed. A rename
+// to a title another todo already has is refused with 409.
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const body = await req.json();
   const patch: UpdateTodoInput = {};
@@ -18,6 +20,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const title = parseTitle(body.title);
     if (title === null) {
       return badRequest(`title must be 1 to ${MAX_TITLE_LENGTH} characters of text`);
+    }
+    const clash = findByTitle(await listTodos(), title);
+    if (clash && clash.id !== params.id) {
+      return NextResponse.json({ error: "another todo already has this title" }, { status: 409 });
     }
     patch.title = title;
   }
