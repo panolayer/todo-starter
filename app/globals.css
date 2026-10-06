@@ -279,6 +279,16 @@ body {
   border-radius: 6px;
 }
 
+a.text-button {
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
 .text-button:hover {
   color: var(--text);
   background: var(--panel-2);
