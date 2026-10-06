@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
 import { listTodos, createTodo } from "@/lib/todos";
+import { filterTodos } from "@/lib/filters";
+import { parseListQuery } from "@/lib/query";
+import { summarize } from "@/lib/stats";
 
-// GET /api/todos — return every todo, newest first.
-export async function GET() {
-  const todos = await listTodos();
-  return NextResponse.json({ todos });
+// GET /api/todos — list todos, newest first.
+//
+// Optional query parameters: `status` (all | active | completed), `q` (search
+// text) and `limit` (how many to return). The response carries the page of
+// todos, how many todos matched in total, and a summary of the whole list.
+export async function GET(req: Request) {
+  const { status, q, limit } = parseListQuery(new URL(req.url).searchParams);
+  const all = await listTodos();
+  const matching = filterTodos(all, status, q);
+  return NextResponse.json({
+    todos: matching.slice(0, limit),
+    matched: matching.length,
+    summary: summarize(all),
+  });
 }
 
 // POST /api/todos — create a new todo from the posted JSON body.

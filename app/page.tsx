@@ -1,29 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { CreateTodoInput, Todo } from "@/lib/types";
+import type { StatusFilter } from "@/lib/filters";
+import type { TodoSummary } from "@/lib/stats";
 import { toDateKey } from "@/lib/dates";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
+import { Toolbar } from "@/components/Toolbar";
+
+const PAGE_SIZE = 20;
+const EMPTY_SUMMARY: TodoSummary = { total: 0, active: 0, completed: 0 };
 
 // The home page is a thin client that talks to the API routes under
 // /api/todos. It never imports the data layer directly — the network boundary
 // keeps the frontend and backend cleanly separated.
 export default function HomePage() {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [matched, setMatched] = useState(0);
+  const [summary, setSummary] = useState<TodoSummary>(EMPTY_SUMMARY);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [query, setQuery] = useState("");
+  const [limit, setLimit] = useState(PAGE_SIZE);
   const today = toDateKey(new Date());
 
-  async function refresh() {
-    const res = await fetch("/api/todos");
-    const data = await res.json();
-    setTodos(data.todos ?? []);
-    setLoading(false);
-  }
+  const refresh = useCallback(
+    async (signal?: AbortSignal) => {
+      const params = new URLSearchParams({ status, q: query, limit: String(limit) });
+      const res = await fetch(`/api/todos?${params}`, { signal });
+      const data = await res.json();
+      setTodos(data.todos ?? []);
+      setMatched(data.matched ?? 0);
+      setSummary(data.summary ?? EMPTY_SUMMARY);
+      setLoading(false);
+    },
+    [status, query, limit],
+  );
 
+  // Refetch whenever the filter, search, or page size changes. A newer request
+  // aborts the previous one so a slow response can never overwrite a newer list.
   useEffect(() => {
-    refresh();
-  }, []);
+    const controller = new AbortController();
+    refresh(controller.signal).catch((err) => {
+      if (err.name !== "AbortError") throw err;
+    });
+    return () => controller.abort();
+  }, [refresh]);
 
   async function addTodo(input: CreateTodoInput) {
     await fetch("/api/todos", {
@@ -48,22 +71,47 @@ export default function HomePage() {
     await refresh();
   }
 
-  const remaining = todos.filter((t) => !t.completed).length;
+  function changeStatus(next: StatusFilter) {
+    setStatus(next);
+    setLimit(PAGE_SIZE);
+  }
+
+  function changeQuery(next: string) {
+    setQuery(next);
+    setLimit(PAGE_SIZE);
+  }
+
+  const filtered = status !== "all" || query.trim() !== "";
 
   return (
     <main className="container">
       <header className="header">
         <h1>Todos</h1>
-        <p className="subtitle">{loading ? "Loading…" : `${remaining} remaining`}</p>
+        <p className="subtitle">{loading ? "Loading…" : `${summary.active} left to do`}</p>
       </header>
       <AddTodoForm onAdd={addTodo} defaultPriority="medium" />
+      <Toolbar
+        status={status}
+        query={query}
+        summary={summary}
+        onStatusChange={changeStatus}
+        onQueryChange={changeQuery}
+      />
       <TodoList
         todos={todos}
         today={today}
+        emptyMessage={
+          filtered ? "No todos match this view." : "Nothing here yet — add your first todo above."
+        }
         onToggle={(id, completed) => updateTodo(id, { completed })}
         onRename={(id, title) => updateTodo(id, { title })}
         onDelete={removeTodo}
       />
+      {todos.length < matched && (
+        <button className="show-more" type="button" onClick={() => setLimit(limit + PAGE_SIZE)}>
+          Show more
+        </button>
+      )}
     </main>
   );
 }
